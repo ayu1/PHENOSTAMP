@@ -1,6 +1,6 @@
 # PHENOSTAMP
 
-Markdown file with code to run PHENOSTAMP. 
+I reformatted the PHENOSTAMP code to be run via several functions in a markdwon file format. 
 
 Original code is sourced from: https://github.com/anchangben/PHENOSTAMP
 
