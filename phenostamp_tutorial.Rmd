@@ -1,0 +1,100 @@
+---
+title: "PHENOSTAMP Tutorial"
+author: "Alice Yu"
+output: html_document
+---
+
+Load libraries and code
+```{r, include=F, warning = FALSE}
+libs <- c("graph", "fastcluster", "party",  
+          "plot3D", "MASS", "RColorBrewer", "flowCore", "cluster",
+          "plotly", "CytoDx", "tripack", "deldir", "sp", "Rtsne",
+          "Seurat", "readxl", "tidyverse", "qdap")
+
+lapply(libs, library, character.only = TRUE)
+source("stamp_visualise.R")
+source("stamp_compute.R")
+```
+
+Loading PHENOSTAMP data (tSNE, voronoi, neural network, cluster labels)
+Download data from: `https://github.com/anchangben/PHENOSTAMP`
+```{r}
+load("tsnedat.rdata")
+load("groups.rdata")
+load("vor.rdata")
+load("nn1.rdata")
+```
+
+# Read in FCS flow cytometry data file of interest and format into matrix
+PHENOSTAMP can read in any matrix count file (i.e. scRNA-seq or proteomics data)
+
+```{r}
+fn <- 'data/A_EMT_Adeno_1.fcs'
+cytof_1 <- read.flowSet(fn)
+```
+
+# Processing data
+Data must be asinh transformed before using PHENOSTAMP
+
+```{r}
+cytof_1 <- set2DF(cytof_1, fcsFiles=fn)
+cytof_1['Timepoint'] <- rep(6, nrow(cytof_1))
+cytof_1['clusterids'] <- rep(1, nrow(cytof_1))
+
+char.columns <- setdiff(colnames(cytof_1), 
+                        c("Time", "Event_length", "tSNE1", 
+                          "tSNE2", "xSample", "y"))
+
+cytof_1 <- cytof_1[,char.columns]
+cytof_1 <- sapply(cytof_1, as.numeric)
+cytof_1.mat <- asinh(cytof_1)
+```
+
+Making data with the six markers of interest
+Order of the marker genes matter. Please leave in this format: CD324,  Vimentin, CD44, CD24, Twist, MUC1
+
+```{r}
+antibody.list <- c("CD324", "Vimentin", "CD44", "CD24", "Twist", "MUC1")
+cytof.markers <- cytof_1.mat[,antibody.list]
+```
+
+Optional: load GitHub sample dataset provided by the manuscript
+Select timepoint #3 from Karacost et al. Nat Comm (2020)
+
+```{r}
+#Github Data
+load("newdat_8clusters.rdata")
+load("newdat2_8clusters.rdata")
+newdat <- asinh(newdat)
+timepoint3 <- newdat2[which(newdat2[,"Timepoint"] == 3),]
+timepoint3.markers <- newdat[which(newdat2[,"Timepoint"] == 3),]
+```
+
+# Optioanl step: code to calculate voronoi seeds 
+```{r}
+Timepoint <- names(table(groups))
+optimalbinsize <- optimalbinsize2(groups, Timepoint, as.data.frame(tsnedat), 15)
+vor <- voronoi_mapping(groups, tsnedat, optimalbinsize)
+saveRDS(vor$seeds, "voronoiseeds.rds")
+```
+
+# Running PHENOSTAMP
+```{r}
+predicted.TSNE <- phenostamp(tsnedat, newdat=cytof.markers, newdat2=cytof_1.mat, 
+                           antibody=antibody.list, 
+                           nn=nn1,
+                           outputDir="Output Directory", 
+                           vor=vor$z, file1="file1name", 
+                           sample="samplename")
+```
+
+
+
+
+
+
+
+
+
+
+
