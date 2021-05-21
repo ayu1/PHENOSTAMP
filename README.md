@@ -4,4 +4,4 @@ I reformatted the PHENOSTAMP code to be run via several functions in a markdown 
 
 Original code is sourced from: https://github.com/anchangben/PHENOSTAMP. _stamp_visualize.R_ and _stamp_compute.R_ have been slightly modified.
 
-Data from markdown tutorial is from Karacosta et al. Nat Comm (2020)
+Flow cytometry data used in markdown tutorial is from Karacosta et al. Nat Comm (2020) (https://www.nature.com/articles/s41467-019-13441-6)
