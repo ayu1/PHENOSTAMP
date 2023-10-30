@@ -6,4 +6,4 @@ Original code is sourced from: https://github.com/anchangben/PHENOSTAMP from ini
 
 Flow cytometry data used in markdown tutorial is from Karacosta et al. Nat Comm (2020) (https://www.nature.com/articles/s41467-019-13441-6)
 
-Any questions? Please email me at ayu1@stanford.edu
+Any questions? Please email me at ayu1@alumni.stanford.edu
